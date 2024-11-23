@@ -181,7 +181,7 @@ function addFormField(){
 			
 			button_1 	=  DomElements.addButton({
 							  id: 'addtoformBtn',
-							  showtext: 'Add To Form', 
+							  showtext: 'Add Options', 
 							  needdiv:true,
 							  cssclass:"secondFormDiv",
 							  onClick: addOptions
@@ -244,6 +244,12 @@ function addFieldToFormDiv(){
 	
 	var newindex = fileJSON.length;
 	
+	var getoptionsfordropdown=[];
+	
+	if(getoptions2.length>0){
+		getoptionsfordropdown = JSON.parse(JSON.stringify(getoptions2));
+	}	 
+	
 	label_1 		= DomElements.addLabelTag({
 							label:fieldname,
 							cssclass:"firstFormDiv",		
@@ -299,7 +305,7 @@ function addFieldToFormDiv(){
 	containerforForm.appendChild(button_1);  
 	 				  
 	
-	fileJSON.push({type:type,getid:getid,getname:getname,fieldname:fieldname,placeholder:placeholder});
+	fileJSON.push({type:type,getid:getid,getname:getname,fieldname:fieldname,placeholder:placeholder,addedoptions:getoptionsfordropdown});
 	WebStorage.removeItem("templist");
 	WebStorage.setItem("templist",fileJSON);
 
@@ -330,6 +336,10 @@ function rendertable(datajson){
 	row.cells[1].appendChild(document.createTextNode("")); 
 	row.appendChild(document.createElement('th'));
 	row.cells[2].appendChild(document.createTextNode("")); 
+	row.appendChild(document.createElement('th'));
+	row.cells[3].appendChild(document.createTextNode("")); 
+	row.appendChild(document.createElement('th'));
+	row.cells[4].appendChild(document.createTextNode("")); 
 	table.appendChild(row);	 
 	
 	
@@ -343,10 +353,10 @@ function rendertable(datajson){
 		
 		button_1 	=  DomElements.addButton({
 					  id: item,
-					  showtext: 'View', 
+					  showtext: 'Form View', 
 					  needdiv:true,
 					  cssclass:"thirdDiv",
-					  onClick: editFormField,
+					  onClick: viewFormField,
 					  myParam :item	
 					});		
 		row.cells[1].appendChild(button_1); 
@@ -354,7 +364,7 @@ function rendertable(datajson){
 		row.appendChild(document.createElement('td'));
 		button_1 	=  DomElements.addButton({
 					  id: item,
-					  showtext: 'Delete', 
+					  showtext: 'Delete Form', 
 					  needdiv:true,
 					  cssclass:"thirdDiv",
 					  onClick: deleteFormList,
@@ -362,14 +372,221 @@ function rendertable(datajson){
 					});	 
 		
 		row.cells[2].appendChild(button_1); 
+		
+		
+		row.appendChild(document.createElement('td'));
+		button_1 	=  DomElements.addButton({
+					  id: item,
+					  showtext: 'Add Record', 
+					  needdiv:true,
+					  cssclass:"thirdDiv",
+					  onClick: addRecord,
+					  myParam :item	 	
+					});	 
+		
+		row.cells[3].appendChild(button_1); 
+		
+		row.appendChild(document.createElement('td'));
+		button_1 	=  DomElements.addButton({
+					  id: item,
+					  showtext: 'Show Record', 
+					  needdiv:true,
+					  cssclass:"thirdDiv",
+					  onClick: showRecord,
+					  myParam :item	 	
+					});	 
+		
+		row.cells[4].appendChild(button_1); 
+		
+		
 		table.appendChild(row); 
 	});	
-	tbldiv.appendChild(table);  
+	tbldiv.appendChild(table);   
+}
+ 
+
+function addRecord(){
+	 const id1 = document.getElementById('id1');
+	 const containerforForm = document.getElementById('id2');
+	 containerforForm.innerHTML="";
+	 id1.style.display="none";
+	 containerforForm.style.display="block"; 
+	 
+	getstoredForm = WebStorage.getItem("finalformlist"); 
+	var josnObj = getstoredForm[this.myParam];   
+	 
+	josnObj.forEach((item,index) => {
+			
+			 
+				if(item.type=="text"){
+					 
+					label_1 = DomElements.addLabelTag({
+							label:item.fieldname,
+							cssclass:"firstFormDivDisplay",		
+							needdiv:true, 
+						});			
+					containerforForm.appendChild(label_1); 
+					
+					input_1 = DomElements.addTextField({ 
+											type:item.type,
+											id:item.getid,	
+											name:item.getname,
+											placeholder:item.placeholder, 
+											value:"",
+											cssclass:"secondFormDivDisplay",		
+											needdiv:true, 				
+										});	 
+					containerforForm.appendChild(input_1); 
+					
+				
+				}else if(item.type=="select"){	
+					
+					label_1 = DomElements.addLabelTag({
+							label:item.fieldname,
+							cssclass:"firstFormDivDisplay",		
+							needdiv:true, 
+						});			
+					containerforForm.appendChild(label_1); 
+					
+					input_1 = DomElements.addDropdown({
+					  id: item.getid,
+					  showtext: item.fieldname, 
+					  options: item.addedoptions,
+					  defaultValue: item.addedoptions[0].text, 
+					  cssclass:"secondFormDivDisplay", 
+					  needdiv:true
+					});	
+					containerforForm.appendChild(input_1); 
+					
+				}else if(item.type=="button"){
+					
+					label_1 = DomElements.addLabelTag({
+							label:"",
+							cssclass:"firstFormDivDisplay",		
+							needdiv:true, 
+						});			
+					containerforForm.appendChild(label_1); 
+					
+					 
+					
+					button_1 	=  DomElements.addButton({
+						  id: item.getid,
+						  showtext: item.fieldname, 
+						  needdiv:true,
+						  cssclass:"secondFormDivDisplay",
+						  onClick: saveRecord,
+						  myParam :this.myParam	
+					});		
+					 
+					containerforForm.appendChild(button_1);
+
+				}
+				 
+			});
+			
+			button_1 	=  DomElements.addButton({
+				  id: "btn-xyz",
+				  showtext: "Close", 
+				  needdiv:true,
+				  cssclass:"secondFormDivDisplay",
+				  onClick: closePopup,
+				  myParam :"xyz"
+				});					
+				containerforForm.appendChild(button_1); 
+			
 	
 }
 
+function closePopup(){
+
+	const id1 = document.getElementById('id1');
+	const containerforForm = document.getElementById('id2');
+	containerforForm.innerHTML="";
+	id1.style.display="none";
+	containerforForm.style.display="none"; 
+	 
+}
+
+function saveRecord(){
+	   
+	var josnObj = getstoredForm[this.myParam];   
+	
+	var markers = [];	
+	 
+	josnObj.forEach((item,index) => {
+		 
+		if(item.type!='button'){ 
+			 markers[index]  = document.getElementById(item.getid); 
+			 
+			 markers[index] = {
+					field: item.fieldname,
+					value: document.getElementById(item.getid).value
+			  } 
+		} 
+	});
+	
+	var formrecord = {}; 
+	var getstoredjson = WebStorage.getItem("formrecordlist");	
+	if(getstoredjson){
+		formrecord = getstoredjson; 
+	}	
+	formrecord[this.myParam] = markers;
+	WebStorage.setItem("formrecordlist",formrecord);	
+	alert("Record added");		
+}
+
+
+function showRecord(){
+	 
+	 const id1 = document.getElementById('id1');
+	 const containerforForm = document.getElementById('id2');
+	 containerforForm.innerHTML="";
+	 id1.style.display="none";
+	 containerforForm.style.display="block"; 
+	 
+	getstoredForm = WebStorage.getItem("formrecordlist"); 
+	var josnObj = getstoredForm[this.myParam];  
+	
+	var table = document.createElement('table');
+	 
+	var getcolumn = [];
+	josnObj.forEach((item,index) => { 
+		getcolumn.push(item.field);
+	});
+	
+	var row = document.createElement('tr');	
+	getcolumn.forEach((item,index) => { 
+		row.appendChild(document.createElement('th'));
+		row.cells[index].appendChild(document.createTextNode(getcolumn[index])); 
+	});
+	table.appendChild(row);	 
+	
+	row = document.createElement('tr');
+	josnObj.forEach((item,index) => {
+		 
+		 row.appendChild(document.createElement('td')); 
+		 row.cells[index].appendChild(document.createTextNode(item.value));
+	});
+	 
+	table.appendChild(row);	 
+	 
+	containerforForm.appendChild(table);	 
+
+	button_1 	=  DomElements.addButton({
+	  id: "btn-xyz",
+	  showtext: "Close", 
+	  needdiv:true,
+	  cssclass:"secondFormDivDisplay",
+	  onClick: closePopup,
+	  myParam :"xyz"
+	});					
+	containerforForm.appendChild(button_1); 	
+}
+
+
 //delete field which is added on form div
 function deleteFormField(){ 
+  
 	var getstoredjson = WebStorage.getItem("templist");	
 	if(getstoredjson){ 
 		if(getstoredjson.length>0){ 
@@ -398,11 +615,14 @@ function deleteFormList(){
 	rendertable(getstoredForm);  
 }	
 
+var viewstatus = true;
+var getformid="";
 //render form when needed
 function renderForm(getactualjson){
 		 
 		getactualjson.forEach((item,index) => {
-		 
+			
+			 
 				if(item.type=="text"){
 					 
 					label_1 = DomElements.addLabelTag({
@@ -421,19 +641,27 @@ function renderForm(getactualjson){
 											cssclass:"secondFormDiv",		
 											needdiv:true, 				
 										});	 
-					containerforForm.appendChild(input_1);
+					containerforForm.appendChild(input_1); 
 					
-					button_1 	=  DomElements.addButton({
-					  id: "btn-"+item.getid,
-					  showtext: "Delete", 
-					  needdiv:true,
-					  cssclass:"thirdFormDiv",
-					  onClick: deleteFormField,
-					  myParam :index
-					});					
-					containerforForm.appendChild(button_1); 
-
-
+				
+				}else if(item.type=="select"){	
+					
+					label_1 = DomElements.addLabelTag({
+							label:item.fieldname,
+							cssclass:"firstFormDiv",		
+							needdiv:true, 
+						});			
+					containerforForm.appendChild(label_1); 
+					
+					input_1 = DomElements.addDropdown({
+					  id: item.getid,
+					  showtext: item.fieldname, 
+					  options: item.addedoptions,
+					  defaultValue: item.addedoptions[0].text, 
+					  cssclass:"secondFormDiv", 
+					  needdiv:true
+					});	
+					containerforForm.appendChild(input_1); 
 					
 				}else if(item.type=="button"){
 					
@@ -444,54 +672,101 @@ function renderForm(getactualjson){
 						});			
 					containerforForm.appendChild(label_1); 
 					
-					button_1 	=  DomElements.addButton({
-					  id: item.getid,
-					  showtext: item.fieldname, 
-					  needdiv:true,
-					  cssclass:"secondFormDiv",
-					  onClick: saveFormField
-					});					
+					if(viewstatus==false){
+						
+						button_1 	=  DomElements.addButton({
+							  id: item.getid,
+							  showtext: item.fieldname, 
+							  needdiv:true,
+							  cssclass:"secondFormDiv",
+							  onClick: saveFormField
+						});					
+					}else{
+					
+						button_1 	=  DomElements.addButton({
+							  id: item.getid,
+							  showtext: item.fieldname, 
+							  needdiv:true,
+							  cssclass:"secondFormDiv",
+							  onClick: saveFormField
+						});		
+					}
+					
 					containerforForm.appendChild(button_1);
 
 				}
+				
+				 
+					
+				button_1 	=  DomElements.addButton({
+				  id: "btn-"+item.getid,
+				  showtext: "Delete", 
+				  needdiv:true,
+				  cssclass:"thirdFormDiv",
+				  onClick: deleteFormField,
+				  myParam :index
+				});					
+				containerforForm.appendChild(button_1);
+				 
 			});
 	
 }
 
 //save compile form elements.
 function saveFormField(){
-	let doc = prompt("Please enter a form name");
-	if (doc != null) { 
-		let getkeys = Object.keys(getstoredForm); 
-		if(getkeys.indexOf(doc)>=0) {
-			alert("Name already exist!");
-			return false;
-		}else{
-			getstoredForm[doc] = {};
-			getstoredForm[doc] = fileJSON;		 
-			WebStorage.setItem("finalformlist",getstoredForm);
-			WebStorage.removeItem("templist");			
-			containerforForm.innerHTML="";
-			fileJSON=[];
-			tbldiv.innerHTML="";
-			rendertable(getstoredForm); 
-		}		 
+	if(viewstatus==false){
+		
+		getstoredForm = WebStorage.getItem("finalformlist"); 
+		 
+		getstoredForm[getformid] = {};
+		getstoredForm[getformid] = fileJSON;		 
+		WebStorage.setItem("finalformlist",getstoredForm);
+		WebStorage.removeItem("templist");			
+		containerforForm.innerHTML="";
+		fileJSON=[];
+		tbldiv.innerHTML="";
+		rendertable(getstoredForm); 				
+		
+	}else{	
+		let doc = prompt("Please enter a form name");
+		if (doc != null) { 
+			let getkeys = Object.keys(getstoredForm); 
+			if(getkeys.indexOf(doc)>=0) {
+				alert("Name already exist!");
+				return false;
+			}else{
+				getstoredForm[doc] = {};
+				getstoredForm[doc] = fileJSON;		 
+				WebStorage.setItem("finalformlist",getstoredForm);
+				WebStorage.removeItem("templist");			
+				containerforForm.innerHTML="";
+				fileJSON=[];
+				tbldiv.innerHTML="";
+				rendertable(getstoredForm); 
+			}		 
+		}
 	}
 }
  
 //view added elements on form 
-function editFormField(){
+function viewFormField(){
 	getstoredForm = WebStorage.getItem("finalformlist"); 
 	var josnObj = getstoredForm[this.myParam]; 
+ 
+	WebStorage.setItem("templist",josnObj); 
+	
 	containerforForm.innerHTML="";
 	containerforForm.style.display="inline-block";
 	fileJSON = getstoredForm[this.myParam];
-	WebStorage.removeItem("templist");
+	//WebStorage.removeItem("templist");
+	viewstatus=false;
+	getformid=this.myParam;
 	renderForm(josnObj);
 }
  
  //loading all the elements when page reload
 document.addEventListener("DOMContentLoaded", (event)=>{
+	 
 	var getstoredjson = WebStorage.getItem("templist");	
 	if(WebStorage.getItem("finalformlist")!=null){
 		getstoredForm = WebStorage.getItem("finalformlist");
